@@ -1,5 +1,6 @@
 package br.com.space.connect.domain.entities;
 
+import br.com.space.connect.domain.exception.BateriaCriticaException;
 import br.com.space.connect.domain.valueobjects.Coordenada;
 import br.com.space.connect.domain.valueobjects.NivelEnergia;
 
@@ -33,8 +34,13 @@ public abstract class Sonda {
 
     //metodo mover
     public void mover(Coordenada destino) {
-        double custo = Math.abs(destino.getEixoX() - posicaoAtual.getEixoX()) + Math.abs(destino.getEixoY() - posicaoAtual.getEixoY());
-        this.bateria = this.bateria.consumir(custo); // substitui, não altera
+        double custoIda = Math.abs(destino.getEixoX() - posicaoAtual.getEixoX()) + Math.abs(destino.getEixoY() - posicaoAtual.getEixoY());
+        double custoVolta = Math.abs(destino.getEixoX()) + Math.abs(destino.getEixoY());
+        double custoTotal = custoIda + custoVolta;
+        if (custoTotal > bateria.getCapacidadeAtual()) {
+            throw new BateriaCriticaException("Energia insuficiente para ir ao destino e voltar à base.");
+        }
+        this.bateria = this.bateria.consumir(custoTotal); // substitui, não altera
         this.posicaoAtual = destino; // substitui, não altera
     }
 
@@ -48,6 +54,6 @@ public abstract class Sonda {
         //3-realizar ação
         realizarAcaoLocal();
         //4-enviar relatorio
-        System.out.println("Relatório enviado com sucesso. Sonda:" + getIdSonda()+"na coordenada" + posicaoAtual.getEixoX() + posicaoAtual.getEixoY());
+        System.out.println("Relatório enviado com sucesso. Sonda: " + getIdSonda()+" na coordenada X: " + posicaoAtual.getEixoX() +" Y: "+ posicaoAtual.getEixoY());
     }
 }

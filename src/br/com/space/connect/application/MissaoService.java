@@ -3,6 +3,7 @@ package br.com.space.connect.application;
 import br.com.space.connect.domain.entities.CentroDeComando;
 import br.com.space.connect.domain.entities.Sonda;
 import br.com.space.connect.domain.factory.SondaFactory;
+import br.com.space.connect.domain.interfaces.Recarregavel;
 import br.com.space.connect.domain.interfaces.SondaRepository;
 import br.com.space.connect.domain.valueobjects.Coordenada;
 
@@ -35,6 +36,20 @@ public class MissaoService {
     public void enviarSonda(String id, Coordenada destino){
         Sonda sonda = repository.buscarPorId(id);
         sonda.executarRotinaAutonoma(destino);
+    }
+
+    public void recarregarSonda(String id) {
+        Sonda sonda = repository.buscarPorId(id);
+
+        if (sonda.getPosicaoAtual().getEixoX() != 0 || sonda.getPosicaoAtual().getEixoY() != 0) {
+            throw new IllegalArgumentException("A sonda precisa estar na base (0,0) para recarregar.");
+        }
+
+        if (sonda instanceof Recarregavel) {
+            ((Recarregavel) sonda).conectarBase();
+        } else {
+            throw new IllegalArgumentException("Essa sonda não suporta recarga.");
+        }
     }
 
 
