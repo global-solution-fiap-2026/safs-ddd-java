@@ -56,4 +56,12 @@ public abstract class Sonda {
         //4-enviar relatorio
         System.out.println("Relatório enviado com sucesso. Sonda: " + getIdSonda()+" na coordenada X: " + posicaoAtual.getEixoX() +" Y: "+ posicaoAtual.getEixoY());
     }
+
+    public String getStatus() {
+        return "ID: " + idSonda +
+                " | Bateria: " + bateria.getCapacidadeAtual() +
+                "/" + bateria.getCapacidadeMaxima() +
+                " | Posição: (" + posicaoAtual.getEixoX() +
+                ", " + posicaoAtual.getEixoY() + ")";
+    }
 }

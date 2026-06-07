@@ -30,4 +30,10 @@ public class SondaExploradora extends Sonda implements Recarregavel {
     public void conectarBase() {
         bateria = new NivelEnergia(bateria.getCapacidadeMaxima(), bateria.getCapacidadeMaxima());
     }
+
+    @Override
+    public String getStatus() {
+        return super.getStatus() +
+                " | Alcance do sensor: " + alcanceSensor;
+    }
 }

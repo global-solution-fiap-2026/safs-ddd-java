@@ -3,6 +3,7 @@ package br.com.space.connect.presentation;
 import br.com.space.connect.application.MissaoService;
 import br.com.space.connect.domain.entities.Sonda;
 import br.com.space.connect.domain.exception.BateriaCriticaException;
+import br.com.space.connect.domain.exception.CargaExcedidaException;
 import br.com.space.connect.domain.interfaces.SondaRepository;
 import br.com.space.connect.domain.valueobjects.Coordenada;
 import br.com.space.connect.infrastructure.SondaRepositoryEmMemoria;
@@ -40,12 +41,7 @@ public class Main {
                 case 2 -> {
                     System.out.println("Listando as sondas ativas: ");
                     missaoService.listarSondas()
-                            .forEach(sonda -> System.out.println(
-                                    "ID: " + sonda.getIdSonda() +
-                                            " | Bateria: " + sonda.getBateria().getCapacidadeAtual() +
-                                            " | Posição: (" + sonda.getPosicaoAtual().getEixoX() +
-                                            ", " + sonda.getPosicaoAtual().getEixoY() + ")"
-                            ));
+                            .forEach(sonda -> System.out.println(sonda.getStatus()));
                 }
                 case 3 -> {
                     System.out.println("Digite o ID da sonda que deseja enviar: ");
@@ -71,6 +67,8 @@ public class Main {
                         System.out.println("⚠ Alerta: Bateria Crítica! " + e.getMessage());
                     } catch (IllegalArgumentException e) {
                         System.out.println("⚠ Erro: " + e.getMessage());
+                    } catch (CargaExcedidaException e) {
+                        System.out.println("⚠ Alerta: Carga Excedida! " + e.getMessage());
                     }
                 }
                 case 4 ->{
