@@ -4,8 +4,11 @@ import br.com.space.connect.application.MissaoService;
 import br.com.space.connect.domain.entities.Sonda;
 import br.com.space.connect.domain.exception.BateriaCriticaException;
 import br.com.space.connect.domain.exception.CargaExcedidaException;
+import br.com.space.connect.domain.exception.TerrenoInvalidoException;
 import br.com.space.connect.domain.interfaces.SondaRepository;
 import br.com.space.connect.domain.valueobjects.Coordenada;
+import br.com.space.connect.domain.valueobjects.Recurso;
+import br.com.space.connect.domain.valueobjects.Terreno;
 import br.com.space.connect.infrastructure.SondaRepositoryEmMemoria;
 
 import java.util.Scanner;
@@ -31,8 +34,16 @@ public class Main {
                 case 1 -> {
                     System.out.println("Tipo de sonda (MINERACAO / EXPLORACAO): ");
                     String tipo = scanner.next();
+                    Recurso recurso = null;
+
+                    if(tipo.equalsIgnoreCase("MINERACAO")){
+                        System.out.println("Tipo de recurso: (GELO / REGOLITO / TITANIO)");
+                        recurso = Recurso.valueOf(scanner.next().toUpperCase());
+                    }
+
+                    System.out.println("Tipo de Terreno inicial: PLANICIE");
                     try {
-                        Sonda sonda = missaoService.lancarSonda(tipo);
+                        Sonda sonda = missaoService.lancarSonda(tipo, recurso);
                         System.out.println("Sonda lançada com sucesso: " + sonda.getIdSonda());
                     } catch (IllegalArgumentException e) {
                         System.out.println("Erro: " + e.getMessage());
@@ -58,10 +69,13 @@ public class Main {
                     int eixoX = scanner.nextInt();
                     System.out.println("Y: ");
                     int eixoY = scanner.nextInt();
+                    System.out.println("Tipo de terreno (PLANICIE / SOLO_ROCHOSO / CRATERA): ");
+                    String tipoTerreno = scanner.next();
 
                     try {
                         Coordenada destino = new Coordenada(eixoX, eixoY);
-                        missaoService.enviarSonda(idSonda, destino);
+                        Terreno terreno = Terreno.valueOf(tipoTerreno.toUpperCase());
+                        missaoService.enviarSonda(idSonda, destino, terreno);
                         System.out.println("Missão executada com sucesso!");
                     } catch (BateriaCriticaException e) {
                         System.out.println("⚠ Alerta: Bateria Crítica! " + e.getMessage());
@@ -69,6 +83,8 @@ public class Main {
                         System.out.println("⚠ Erro: " + e.getMessage());
                     } catch (CargaExcedidaException e) {
                         System.out.println("⚠ Alerta: Carga Excedida! " + e.getMessage());
+                    } catch (TerrenoInvalidoException e) {
+                        System.out.println("⚠ Alerta: Terreno Inválido! " + e.getMessage());
                     }
                 }
                 case 4 ->{

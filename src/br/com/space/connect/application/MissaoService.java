@@ -6,6 +6,8 @@ import br.com.space.connect.domain.factory.SondaFactory;
 import br.com.space.connect.domain.interfaces.Recarregavel;
 import br.com.space.connect.domain.interfaces.SondaRepository;
 import br.com.space.connect.domain.valueobjects.Coordenada;
+import br.com.space.connect.domain.valueobjects.Recurso;
+import br.com.space.connect.domain.valueobjects.Terreno;
 
 import java.util.Collection;
 
@@ -18,8 +20,15 @@ public class MissaoService {
         this.centroDeComando = CentroDeComando.getInstancia();
     }
 
-    public Sonda lancarSonda(String tipo){
-        Sonda sonda = SondaFactory.criarSonda(tipo);
+    public Sonda lancarSonda(String tipo, Recurso recurso) {
+        Sonda sonda;
+        if (tipo.equalsIgnoreCase("MINERACAO")) {
+            sonda = SondaFactory.criarSondaMineradora(recurso);
+        } else if (tipo.equalsIgnoreCase("EXPLORACAO")) {
+            sonda = SondaFactory.criarSondaExploradora();
+        } else {
+            throw new IllegalArgumentException("Tipo de sonda inexistente.");
+        }
         repository.salvar(sonda);
         centroDeComando.registrarSonda(sonda);
         return sonda;
@@ -33,9 +42,9 @@ public class MissaoService {
         return repository.buscarPorId(id);
     }
 
-    public void enviarSonda(String id, Coordenada destino){
+    public void enviarSonda(String id, Coordenada destino, Terreno terreno){
         Sonda sonda = repository.buscarPorId(id);
-        sonda.executarRotinaAutonoma(destino);
+        sonda.executarRotinaAutonoma(destino, terreno);
     }
 
     public void recarregarSonda(String id) {

@@ -3,12 +3,13 @@ package br.com.space.connect.domain.entities;
 import br.com.space.connect.domain.valueobjects.Coordenada;
 import br.com.space.connect.domain.valueobjects.NivelEnergia;
 import br.com.space.connect.domain.interfaces.Recarregavel;
+import br.com.space.connect.domain.valueobjects.Terreno;
 
 public class SondaExploradora extends Sonda implements Recarregavel {
     private Double alcanceSensor;
 
-    public SondaExploradora(String idSonda, NivelEnergia bateria, Coordenada posicaoAtual, Double alcanceSensor){
-        super(idSonda, bateria, posicaoAtual);
+    public SondaExploradora(String idSonda, NivelEnergia bateria, Coordenada posicaoAtual, Terreno terreno, Double alcanceSensor){
+        super(idSonda, bateria, posicaoAtual, terreno);
         if(alcanceSensor <= 0){
             throw new IllegalArgumentException("Alcance do sensor deve ser maior que zero");
         }

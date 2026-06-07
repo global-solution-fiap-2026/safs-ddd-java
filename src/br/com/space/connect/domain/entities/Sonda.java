@@ -1,21 +1,25 @@
 package br.com.space.connect.domain.entities;
 
 import br.com.space.connect.domain.exception.BateriaCriticaException;
+import br.com.space.connect.domain.exception.TerrenoInvalidoException;
 import br.com.space.connect.domain.valueobjects.Coordenada;
 import br.com.space.connect.domain.valueobjects.NivelEnergia;
+import br.com.space.connect.domain.valueobjects.Terreno;
 
 public abstract class Sonda {
     protected String idSonda;
     protected NivelEnergia bateria;
     protected Coordenada posicaoAtual;
+    protected Terreno terreno;
 
-    public Sonda(String idSonda, NivelEnergia bateria, Coordenada posicaoAtual){
+    public Sonda(String idSonda, NivelEnergia bateria, Coordenada posicaoAtual, Terreno terreno){
         if (idSonda == null || idSonda.isBlank()) {
             throw new IllegalArgumentException("ID da sonda não pode ser nulo ou vazio.");
         }
         this.idSonda = idSonda;
         this.bateria = bateria;
         this.posicaoAtual = posicaoAtual;
+        this.terreno = terreno;
     }
 
     public String getIdSonda() {
@@ -33,24 +37,29 @@ public abstract class Sonda {
     public abstract void realizarAcaoLocal();
 
     //metodo mover
-    public void mover(Coordenada destino) {
-        double custoIda = Math.abs(destino.getEixoX() - posicaoAtual.getEixoX()) + Math.abs(destino.getEixoY() - posicaoAtual.getEixoY());
+    public void mover(Coordenada destino, Terreno terreno) {
+        if (terreno == Terreno.CRATERA) {
+            throw new TerrenoInvalidoException("Sonda com rodas não pode entrar em uma Cratera.");
+        }
+        double custoIda = Math.abs(destino.getEixoX() - posicaoAtual.getEixoX())
+                + Math.abs(destino.getEixoY() - posicaoAtual.getEixoY());
         double custoVolta = Math.abs(destino.getEixoX()) + Math.abs(destino.getEixoY());
-        double custoTotal = custoIda + custoVolta;
+        double custoTotal = (custoIda + custoVolta) * terreno.getMultiplicadorConsumo();
         if (custoTotal > bateria.getCapacidadeAtual()) {
             throw new BateriaCriticaException("Energia insuficiente para ir ao destino e voltar à base.");
         }
-        this.bateria = this.bateria.consumir(custoTotal); // substitui, não altera
-        this.posicaoAtual = destino; // substitui, não altera
+        this.bateria = this.bateria.consumir(custoTotal);
+        this.posicaoAtual = destino;
+        this.terreno = terreno;
     }
 
     //template method
-    public void executarRotinaAutonoma(Coordenada destino){
+    public void executarRotinaAutonoma(Coordenada destino, Terreno terreno){
         //1-validar status sistema
         System.out.println("Validando sistema... Bateria: "
                 + bateria.getCapacidadeAtual() + "/" + bateria.getCapacidadeMaxima());
         //2-mover sonda ao destino
-        mover(destino);
+        mover(destino, terreno);
         //3-realizar ação
         realizarAcaoLocal();
         //4-enviar relatorio

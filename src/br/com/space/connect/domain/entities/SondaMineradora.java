@@ -1,18 +1,18 @@
 package br.com.space.connect.domain.entities;
 
-import br.com.space.connect.domain.valueobjects.CompartimentoCarga;
-import br.com.space.connect.domain.valueobjects.Coordenada;
-import br.com.space.connect.domain.valueobjects.NivelEnergia;
+import br.com.space.connect.domain.valueobjects.*;
 import br.com.space.connect.domain.interfaces.Recarregavel;
 
 public class SondaMineradora extends Sonda implements Recarregavel {
     private CompartimentoCarga carga;
     private Double quantidadeExtraida;
+    private Recurso recurso;
 
-    public SondaMineradora(String idSonda, NivelEnergia bateria, Coordenada posicaoAtual, CompartimentoCarga carga, Double quantidadeExtraida){
-        super(idSonda, bateria, posicaoAtual);
+    public SondaMineradora(String idSonda, NivelEnergia bateria, Coordenada posicaoAtual, Terreno terreno, CompartimentoCarga carga, Double quantidadeExtraida, Recurso recurso){
+        super(idSonda, bateria, posicaoAtual, terreno);
         this.carga = carga;
         this.quantidadeExtraida = quantidadeExtraida;
+        this.recurso = recurso;
     }
 
     public CompartimentoCarga getCarga() {
@@ -27,15 +27,18 @@ public class SondaMineradora extends Sonda implements Recarregavel {
     @Override
     public void realizarAcaoLocal() {
         this.carga = this.carga.adicionar(quantidadeExtraida);
+
         System.out.println("Mineração concluída! Extraídas " + quantidadeExtraida
                 + " unidades. Carga atual: " + carga.getVolumeOcupado()
-                + "/" + carga.getVolumeMaximo());
+                + "/" + carga.getVolumeMaximo()
+                + "\n/ Recurso extraído: " + recurso.getNome());
     }
 
     @Override
     public String getStatus() {
         return super.getStatus() +
                 " | Carga: " + carga.getVolumeOcupado() +
-                "/" + carga.getVolumeMaximo();
+                "/" + carga.getVolumeMaximo() +
+                "\n| Recurso: " + recurso.getNome();
     }
 }
