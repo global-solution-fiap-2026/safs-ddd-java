@@ -50,10 +50,18 @@ public class Main {
                 case 3 -> {
                     System.out.println("Digite o ID da sonda que deseja enviar: ");
                     String idSonda = scanner.next();
-                    System.out.println("Digite as cordenadas x e y de destino da sonda\nX: ");
-                    Integer eixoX = scanner.nextInt();
+
+                    try {
+                        missaoService.buscarSonda(idSonda); // valida se existe antes de continuar
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("⚠ Erro: " + e.getMessage());
+                        break;
+                    }
+
+                    System.out.println("X: ");
+                    int eixoX = scanner.nextInt();
                     System.out.println("Y: ");
-                    Integer eixoY = scanner.nextInt();
+                    int eixoY = scanner.nextInt();
 
                     try {
                         Coordenada destino = new Coordenada(eixoX, eixoY);
@@ -62,7 +70,7 @@ public class Main {
                     } catch (BateriaCriticaException e) {
                         System.out.println("⚠ Alerta: Bateria Crítica! " + e.getMessage());
                     } catch (IllegalArgumentException e) {
-                    System.out.println("⚠ Erro: " + e.getMessage());
+                        System.out.println("⚠ Erro: " + e.getMessage());
                     }
                 }
                 case 4 ->{
