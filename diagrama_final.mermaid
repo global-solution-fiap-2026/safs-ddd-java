@@ -1,0 +1,191 @@
+classDiagram
+
+    %% Value Objects
+    class Coordenada {
+        <<Value Object>>
+        -int eixoX
+        -int eixoY
+        +getEixoX() int
+        +getEixoY() int
+    }
+
+    class NivelEnergia {
+        <<Value Object>>
+        -double capacidadeAtual
+        -double capacidadeMaxima
+        +getCapacidadeAtual() double
+        +getCapacidadeMaxima() double
+        +consumir(double quantidade) NivelEnergia
+    }
+
+    class CompartimentoCarga {
+        <<Value Object>>
+        -double volumeOcupado
+        -double volumeMaximo
+        +getVolumeOcupado() double
+        +getVolumeMaximo() double
+        +adicionar(double volume) CompartimentoCarga
+    }
+
+    class Terreno {
+        <<Enum>>
+        PLANICIE
+        SOLO_ROCHOSO
+        CRATERA
+        -String tipoSolo
+        -double multiplicadorConsumo
+        +getTipoSolo() String
+        +getMultiplicadorConsumo() double
+    }
+
+    class Recurso {
+        <<Enum>>
+        GELO
+        REGOLITO
+        TITANIO
+        -String nome
+        -double pesoPorUnidade
+        +getNome() String
+        +getPesoPorUnidade() double
+    }
+
+    %% Exceptions
+    class BateriaCriticaException {
+        <<Exception>>
+        +BateriaCriticaException(String mensagem)
+    }
+
+    class CargaExcedidaException {
+        <<Exception>>
+        +CargaExcedidaException(String mensagem)
+    }
+
+    class TerrenoInvalidoException {
+        <<Exception>>
+        +TerrenoInvalidoException(String mensagem)
+    }
+
+    %% Interfaces
+    class Recarregavel {
+        <<Interface>>
+        +conectarBase() void
+    }
+
+    class SondaRepository {
+        <<Interface>>
+        +salvar(Sonda sonda) void
+        +buscarPorId(String id) Sonda
+        +listarTodas() Collection~Sonda~
+    }
+
+    %% Entities
+    class Sonda {
+        <<Abstract Entity>>
+        #String idSonda
+        #NivelEnergia bateria
+        #Coordenada posicaoAtual
+        #Terreno terreno
+        +getIdSonda() String
+        +getBateria() NivelEnergia
+        +getPosicaoAtual() Coordenada
+        +mover(Coordenada destino, Terreno terreno) void
+        +executarRotinaAutonoma(Coordenada destino, Terreno terreno) void
+        +getStatus() String
+        +realizarAcaoLocal()* void
+    }
+
+    class SondaMineradora {
+        <<Entity>>
+        -CompartimentoCarga carga
+        -double quantidadeExtraida
+        -Recurso recurso
+        +getCarga() CompartimentoCarga
+        +realizarAcaoLocal() void
+        +getStatus() String
+        +conectarBase() void
+    }
+
+    class SondaExploradora {
+        <<Entity>>
+        -double alcanceSensor
+        +getAlcanceSensor() double
+        +realizarAcaoLocal() void
+        +getStatus() String
+        +conectarBase() void
+    }
+
+    class CentroDeComando {
+        <<Singleton>>
+        -CentroDeComando instancia$
+        -Map~String_Sonda~ sondas
+        -CentroDeComando()
+        +getInstancia()$ CentroDeComando
+        +registrarSonda(Sonda sonda) void
+        +listarSondas() Collection~Sonda~
+        +buscarSonda(String id) Sonda
+    }
+
+    class SondaFactory {
+        <<Factory>>
+        -int contador$
+        +criarSondaMineradora(Recurso recurso, double bateria, double carga)$ Sonda
+        +criarSondaExploradora(double bateria, double alcance)$ Sonda
+    }
+
+    %% Infrastructure
+    class SondaRepositoryEmMemoria {
+        <<Infrastructure>>
+        -Map~String_Sonda~ bancoSondas
+        +salvar(Sonda sonda) void
+        +buscarPorId(String id) Sonda
+        +listarTodas() Collection~Sonda~
+    }
+
+    %% Application
+    class MissaoService {
+        <<Application>>
+        -SondaRepository repository
+        -CentroDeComando centroDeComando
+        +lancarSonda(String tipo, Recurso recurso, double bateria, double carga, double alcance) Sonda
+        +listarStatusSondas() List~String~
+        +buscarSonda(String id) Sonda
+        +getStatusSonda(String id) String
+        +enviarSonda(String id, Coordenada destino, Terreno terreno) void
+        +recarregarSonda(String id) void
+    }
+
+    %% Presentation
+    class Main {
+        <<Presentation>>
+        +main(String[] args)$ void
+    }
+
+    %% Herança
+    Sonda <|-- SondaMineradora
+    Sonda <|-- SondaExploradora
+
+    %% Interfaces
+    Recarregavel <|.. SondaMineradora
+    Recarregavel <|.. SondaExploradora
+    SondaRepository <|.. SondaRepositoryEmMemoria
+
+    %% Composição
+    Sonda *-- NivelEnergia
+    Sonda *-- Coordenada
+    Sonda *-- Terreno
+    SondaMineradora *-- CompartimentoCarga
+    SondaMineradora *-- Recurso
+
+    %% Dependências
+    SondaFactory ..> SondaMineradora : cria
+    SondaFactory ..> SondaExploradora : cria
+    CentroDeComando o-- Sonda : registra
+    MissaoService --> SondaRepository : usa
+    MissaoService --> CentroDeComando : usa
+    MissaoService ..> SondaFactory : usa
+    Main --> MissaoService : usa
+
+    %% Exceptions
+    NivelEnergia ..> BateriaCriticaException : lança
+    CompartimentoCarga ..> CargaExcedidaException : lança
+    Sonda ..> TerrenoInvalidoException : lança
