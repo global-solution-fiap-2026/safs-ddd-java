@@ -10,6 +10,8 @@ import br.com.space.connect.domain.valueobjects.Recurso;
 import br.com.space.connect.domain.valueobjects.Terreno;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class MissaoService {
     private final SondaRepository repository;
@@ -20,22 +22,18 @@ public class MissaoService {
         this.centroDeComando = CentroDeComando.getInstancia();
     }
 
-    public Sonda lancarSonda(String tipo, Recurso recurso) {
+    public Sonda lancarSonda(String tipo, Recurso recurso,  double capacidadeMaximaBateria, double capacidadeMaximaCarga, double alcanceSensor) {
         Sonda sonda;
         if (tipo.equalsIgnoreCase("MINERACAO")) {
-            sonda = SondaFactory.criarSondaMineradora(recurso);
+            sonda = SondaFactory.criarSondaMineradora(recurso, capacidadeMaximaBateria, capacidadeMaximaCarga);
         } else if (tipo.equalsIgnoreCase("EXPLORACAO")) {
-            sonda = SondaFactory.criarSondaExploradora();
+            sonda = SondaFactory.criarSondaExploradora(capacidadeMaximaBateria, alcanceSensor);
         } else {
             throw new IllegalArgumentException("Tipo de sonda inexistente.");
         }
         repository.salvar(sonda);
         centroDeComando.registrarSonda(sonda);
         return sonda;
-    }
-
-    public Collection<Sonda> listarSondas(){
-        return repository.listarTodas();
     }
 
     public Sonda buscarSonda(String id){
@@ -45,20 +43,28 @@ public class MissaoService {
     public void enviarSonda(String id, Coordenada destino, Terreno terreno){
         Sonda sonda = repository.buscarPorId(id);
         sonda.executarRotinaAutonoma(destino, terreno);
+        sonda.getStatus();
     }
 
     public void recarregarSonda(String id) {
         Sonda sonda = repository.buscarPorId(id);
-
-        if (sonda.getPosicaoAtual().getEixoX() != 0 || sonda.getPosicaoAtual().getEixoY() != 0) {
-            throw new IllegalArgumentException("A sonda precisa estar na base (0,0) para recarregar.");
-        }
-
+        Coordenada base = new Coordenada(0,0);
+        sonda.mover(base, Terreno.PLANICIE);
         if (sonda instanceof Recarregavel) {
             ((Recarregavel) sonda).conectarBase();
         } else {
             throw new IllegalArgumentException("Essa sonda não suporta recarga.");
         }
+    }
+
+    public String getStatusSonda(String id) {
+        return repository.buscarPorId(id).getStatus();
+    }
+
+    public List<String> listarStatusSondas() {
+        return repository.listarTodas().stream()
+                .map(Sonda::getStatus)
+                .collect(Collectors.toList());
     }
 
 

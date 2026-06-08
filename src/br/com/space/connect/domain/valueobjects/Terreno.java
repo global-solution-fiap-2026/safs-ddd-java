@@ -3,7 +3,7 @@ package br.com.space.connect.domain.valueobjects;
 public enum Terreno {
         PLANICIE("Planície", 1.0),
         SOLO_ROCHOSO("Solo Rochoso", 1.5),
-        CRATERA("Cratera", 2.0);  // ponto e vírgula aqui
+        CRATERA("Cratera", 2.0);
 
         private final String tipoSolo;
         private final double multiplicadorConsumo;

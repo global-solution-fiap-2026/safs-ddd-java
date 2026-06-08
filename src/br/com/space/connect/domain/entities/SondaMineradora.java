@@ -26,11 +26,13 @@ public class SondaMineradora extends Sonda implements Recarregavel {
 
     @Override
     public void realizarAcaoLocal() {
-        this.carga = this.carga.adicionar(quantidadeExtraida);
+        double volumeExtraido = quantidadeExtraida * recurso.getPesoPorUnidade();
+        this.carga = this.carga.adicionar(volumeExtraido);
 
         System.out.println("Mineração concluída! Extraídas " + quantidadeExtraida
                 + " unidades. Carga atual: " + carga.getVolumeOcupado()
                 + "/" + carga.getVolumeMaximo()
+                + "Volume extraído: " + volumeExtraido
                 + "\n/ Recurso extraído: " + recurso.getNome());
     }
 

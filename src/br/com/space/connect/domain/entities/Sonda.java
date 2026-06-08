@@ -41,14 +41,12 @@ public abstract class Sonda {
         if (terreno == Terreno.CRATERA) {
             throw new TerrenoInvalidoException("Sonda com rodas não pode entrar em uma Cratera.");
         }
-        double custoIda = Math.abs(destino.getEixoX() - posicaoAtual.getEixoX())
+        double custo = Math.abs(destino.getEixoX() - posicaoAtual.getEixoX())
                 + Math.abs(destino.getEixoY() - posicaoAtual.getEixoY());
-        double custoVolta = Math.abs(destino.getEixoX()) + Math.abs(destino.getEixoY());
-        double custoTotal = (custoIda + custoVolta) * terreno.getMultiplicadorConsumo();
-        if (custoTotal > bateria.getCapacidadeAtual()) {
-            throw new BateriaCriticaException("Energia insuficiente para ir ao destino e voltar à base.");
+        if (custo > bateria.getCapacidadeAtual()) {
+            throw new BateriaCriticaException("Energia insuficiente.");
         }
-        this.bateria = this.bateria.consumir(custoTotal);
+        this.bateria = this.bateria.consumir(custo);
         this.posicaoAtual = destino;
         this.terreno = terreno;
     }
