@@ -210,9 +210,9 @@ Y: 100
 
 ## 👨‍💻 Autores
 
-Victor Simões Altieri
-Rafael Falaguasta Ferraz
-Gabriel Viana de Souza
+- Victor Simões Altieri,
+- Rafael Falaguasta Ferraz,
+- Gabriel Viana de Souza.
 
 Desenvolvido como projeto acadêmico para a disciplina de **Domain Driven Design - Java** na **FIAP — Engenharia de Software**.
 Orientado pelo professor Eduardo Ramos.
