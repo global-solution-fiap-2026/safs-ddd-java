@@ -141,21 +141,6 @@ src/
 ### Pré-requisitos
 - Java 17+
 - Maven ou sua IDE de preferência (IntelliJ IDEA recomendado)
-  
- ## ⚠️ Aviso para usuários do IntelliJ IDEA
-
-Este repositório não inclui o arquivo `.iml` de configuração da IDE.
-Após clonar o projeto, siga os passos abaixo para configurar corretamente:
-
-1. Abra o IntelliJ IDEA
-2. Vá em **File → New → Project from Existing Sources**
-3. Selecione a pasta do projeto clonado
-4. Escolha **Java** como tipo de projeto
-5. Marque a pasta `src/` como **Source Root**
-6. Selecione o **JDK 17 ou superior**
-7. Clique em **Finish**
-
-O IntelliJ recriará os arquivos de configuração automaticamente.
 
 ### Rodando o projeto
 ```bash
